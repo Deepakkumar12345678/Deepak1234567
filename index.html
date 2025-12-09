@@ -1,231 +1,185 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Locked Site — आपकी निजी साइट</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<meta charset="UTF-8">
+<title>Private Locked Site</title>
 <style>
-  :root{
-    --bg:#0f1724; --card:#0b1220; --accent:#7dd3fc; --glass: rgba(255,255,255,0.03);
-    --muted:#94a3b8;
-    font-family: "Inter", system-ui, Arial;
-  }
-  html,body{height:100%; margin:0; background: linear-gradient(180deg,#021226 0%, #08192b 100%); color:#e6eef6;}
-  .center {
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
-  }
+body{
+  margin:0; padding:0;
+  background:#000; color:#fff;
+  font-family:Arial, sans-serif;
+}
 
-  /* LOCK CARD */
-  .lock-card{ width:100%; max-width:760px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:28px; box-shadow: 0 8px 30px rgba(2,6,23,0.7); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.03);}
-  h1{margin:0 0 8px 0; font-size:22px; letter-spacing:0.2px;}
-  p.lead{color:var(--muted); margin:0 0 16px 0;}
-  .pass-row{display:flex; gap:12px; align-items:center;}
-  input.pass{flex:1; padding:12px 14px; border-radius:10px; border:none; outline:none; background:var(--glass); color:inherit; font-size:16px;}
-  button.btn{padding:10px 14px; border-radius:10px; border:none; cursor:pointer; background:var(--accent); color:#003244; font-weight:600;}
-  .muted{color:var(--muted); font-size:13px;}
-  .shake{ animation:shake .6s; }
-  @keyframes shake{ 10%{transform:translateX(-8px)} 30%{transform:translateX(6px)} 50%{transform:translateX(-4px)} 70%{transform:translateX(2px)} 100%{transform:translateX(0)} }
+/* Lock Screen */
+#lockScreen{
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  height:100vh; text-align:center;
+}
+.lockBox{
+  background:rgba(255,255,255,0.05);
+  padding:20px; border-radius:12px;
+  width:80%; max-width:350px;
+  backdrop-filter:blur(4px);
+}
+input{
+  width:100%; padding:10px;
+  border:none; margin-top:10px;
+  border-radius:6px;
+}
+button{
+  width:100%; padding:10px; margin-top:12px;
+  background:#1e90ff; border:none;
+  color:white; border-radius:6px;
+  font-size:16px;
+}
 
-  /* main content hidden initially */
-  #mainApp{ display:none; padding:28px; max-width:1100px; margin:20px auto; }
-
-  .topbar{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px;}
-  .site-title{ font-weight:700; font-size:18px;}
-  .menu{ display:flex; gap:10px; }
-  .menu button{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:var(--muted); cursor:pointer;}
-  .info{ cursor:pointer; margin-left:8px; color:var(--muted); font-size:14px; }
-
-  /* message box */
-  .message-box{ background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid rgba(255,255,255,0.03); display:flex; flex-direction:column; gap:8px;}
-  .msg-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .msg-text{ font-size:15px; color:#dff8ff; }
-  .meta{ color:var(--muted); font-size:13px; }
-  .controls{ display:flex; gap:8px; }
-  .small-btn{ padding:8px 10px; border-radius:9px; border:none; cursor:pointer; background:rgba(255,255,255,0.03); color:var(--muted); }
-
-  /* hidden sections */
-  .hidden-section{ display:none; margin-top:12px; gap:10px; }
-  .card{ padding:12px; border-radius:10px; border:1px dashed rgba(255,255,255,0.03); background:rgba(255,255,255,0.01); }
-
-  /* user input box */
-  .user-input{ display:none; margin-top:12px; gap:8px; }
-  textarea{ width:100%; min-height:90px; background:transparent; border-radius:8px; border:1px solid rgba(255,255,255,0.04); padding:10px; color:inherit; }
-
-  footer{ color:var(--muted); font-size:13px; margin-top:16px; text-align:center;}
-
-  /* responsive */
-  @media (max-width:600px){ .pass-row{flex-direction:column;} .topbar{flex-direction:column; align-items:flex-start;} }
+/* Main App */
+#mainApp{
+  display:none; padding:20px;
+}
+.section{
+  background:rgba(255,255,255,0.05);
+  border-radius:10px; padding:10px;
+  margin-top:12px;
+}
+.small-btn{
+  padding:6px 12px;
+  background:#444; color:#fff;
+  border:none; border-radius:6px;
+  font-size:13px;
+}
+.muted{opacity:0.6; font-size:13px;}
 </style>
 </head>
 <body>
 
-<div class="center">
-  <div class="lock-card" id="lockCard" role="dialog" aria-label="Unlock site">
-    <h1 id="lockTitle">नमस्ते — इस साइट पर पहुँच सुरक्षित है</h1>
-    <p class="lead" id="lockLead">कृपया सही पासवर्ड डालें। आप चाहें तो नीचे दिए गए सुझाव पढ़कर भी पासवर्ड डाल सकते हैं।</p>
-
-    <div class="pass-row">
-      <input id="passwordInput" class="pass" placeholder="पासवर्ड लिखें..." aria-label="Password input" />
-      <button class="btn" id="unlockBtn">Unlock</button>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-      <div class="muted">पासवर्ड गलत होने पर साइट बोलकर बता देगी।</div>
-      <div style="display:flex; align-items:center;">
-        <button class="small-btn" id="helpBtn">किस तरह काम करता है?</button>
-        <span class="info" title="i">i</span>
-      </div>
-    </div>
-
-    <div style="margin-top:10px; font-size:13px; color:var(--muted);">
-      <strong>सुन्दर सुझाव (उदाहरण):</strong> admin123 , mera_paas , welcome2025
-    </div>
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lockBox">
+    <h2>🔒 Private Access</h2>
+    <input id="password" type="password" placeholder="Enter Password">
+    <button onclick="unlockNow()">Unlock</button>
   </div>
 </div>
 
-<!-- MAIN APP (hidden until correct password) -->
-<main id="mainApp" role="main">
-  <div class="topbar">
-    <div>
-      <div class="site-title">प्राइवेट साइट — आपका स्वागत है</div>
-      <div class="muted">यहाँ आपकी निजी सामग्री और मैसेजेस मिलेंगे</div>
-    </div>
+<!-- MAIN APP -->
+<div id="mainApp">
 
-    <div class="menu">
-      <button id="toggleMessagesBtn">Message Box</button>
-      <button id="toggleHiddenBtn">Pages</button>
-      <button id="toggleUserInputBtn">User Input</button>
-      <button id="voiceGuideBtn">Voice Guide</button>
-    </div>
-  </div>
+<h2>📌 Admin Message</h2>
+<div id="adminMsg" class="section">Loading...</div>
 
-  <!-- Message box -->
-  <section id="messageSection" class="message-box card">
-    <div class="msg-row">
-      <div>
-        <div class="msg-text" id="adminMessage">Loading message...</div>
-        <div class="meta" id="msgTime">—</div>
-      </div>
-      <div class="controls">
-        <button class="small-btn" id="readBtn">👉 पढ़कर सुनाओ</button>
-        <button class="small-btn" id="editLocalBtn" title="Download messages as JSON">🔽 Download</button>
-        <button class="small-btn" id="hideMsgBtn">Hide</button>
-      </div>
-    </div>
-  </section><!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Locked Site — आपकी निजी साइट</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<style>
-  :root{
-    --bg:#0f1724; --card:#0b1220; --accent:#7dd3fc; --glass: rgba(255,255,255,0.03);
-    --muted:#94a3b8;
-    font-family: "Inter", system-ui, Arial;
-  }
-  html,body{height:100%; margin:0; background: linear-gradient(180deg,#021226 0%, #08192b 100%); color:#e6eef6;}
-  .center {
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
-  }
-
-  /* LOCK CARD */
-  .lock-card{ width:100%; max-width:760px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:28px; box-shadow: 0 8px 30px rgba(2,6,23,0.7); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.03);}
-  h1{margin:0 0 8px 0; font-size:22px; letter-spacing:0.2px;}
-  p.lead{color:var(--muted); margin:0 0 16px 0;}
-  .pass-row{display:flex; gap:12px; align-items:center;}
-  input.pass{flex:1; padding:12px 14px; border-radius:10px; border:none; outline:none; background:var(--glass); color:inherit; font-size:16px;}
-  button.btn{padding:10px 14px; border-radius:10px; border:none; cursor:pointer; background:var(--accent); color:#003244; font-weight:600;}
-  .muted{color:var(--muted); font-size:13px;}
-  .shake{ animation:shake .6s; }
-  @keyframes shake{ 10%{transform:translateX(-8px)} 30%{transform:translateX(6px)} 50%{transform:translateX(-4px)} 70%{transform:translateX(2px)} 100%{transform:translateX(0)} }
-
-  /* main content hidden initially */
-  #mainApp{ display:none; padding:28px; max-width:1100px; margin:20px auto; }
-
-  .topbar{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px;}
-  .site-title{ font-weight:700; font-size:18px;}
-  .menu{ display:flex; gap:10px; }
-  .menu button{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:var(--muted); cursor:pointer;}
-  .info{ cursor:pointer; margin-left:8px; color:var(--muted); font-size:14px; }
-
-  /* message box */
-  .message-box{ background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); border-radius:12px; padding:16px; border:1px solid rgba(255,255,255,0.03); display:flex; flex-direction:column; gap:8px;}
-  .msg-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .msg-text{ font-size:15px; color:#dff8ff; }
-  .meta{ color:var(--muted); font-size:13px; }
-  .controls{ display:flex; gap:8px; }
-  .small-btn{ padding:8px 10px; border-radius:9px; border:none; cursor:pointer; background:rgba(255,255,255,0.03); color:var(--muted); }
-
-  /* hidden sections */
-  .hidden-section{ display:none; margin-top:12px; gap:10px; }
-  .card{ padding:12px; border-radius:10px; border:1px dashed rgba(255,255,255,0.03); background:rgba(255,255,255,0.01); }
-
-  /* user input box */
-  .user-input{ display:none; margin-top:12px; gap:8px; }
-  textarea{ width:100%; min-height:90px; background:transparent; border-radius:8px; border:1px solid rgba(255,255,255,0.04); padding:10px; color:inherit; }
-
-  footer{ color:var(--muted); font-size:13px; margin-top:16px; text-align:center;}
-
-  /* responsive */
-  @media (max-width:600px){ .pass-row{flex-direction:column;} .topbar{flex-direction:column; align-items:flex-start;} }
-</style>
-</head>
-<body>
-
-<div class="center">
-  <div class="lock-card" id="lockCard" role="dialog" aria-label="Unlock site">
-    <h1 id="lockTitle">नमस्ते — इस साइट पर पहुँच सुरक्षित है</h1>
-    <p class="lead" id="lockLead">कृपया सही पासवर्ड डालें। आप चाहें तो नीचे दिए गए सुझाव पढ़कर भी पासवर्ड डाल सकते हैं।</p>
-
-    <div class="pass-row">
-      <input id="passwordInput" class="pass" placeholder="पासवर्ड लिखें..." aria-label="Password input" />
-      <button class="btn" id="unlockBtn">Unlock</button>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-      <div class="muted">पासवर्ड गलत होने पर साइट बोलकर बता देगी।</div>
-      <div style="display:flex; align-items:center;">
-        <button class="small-btn" id="helpBtn">किस तरह काम करता है?</button>
-        <span class="info" title="i">i</span>
-      </div>
-    </div>
-
-    <div style="margin-top:10px; font-size:13px; color:var(--muted);">
-      <strong>सुन्दर सुझाव (उदाहरण):</strong> admin123 , mera_paas , welcome2025
-    </div>
-  </div>
+<h2>📝 User Message</h2>
+<div class="section">
+  <textarea id="userMsg" style="width:100%;height:80px;border-radius:6px;padding:8px;"></textarea>
+  <button id="sendUserMsg" class="small-btn">Save Message</button>
+  <button id="downloadUserMsgs" class="small-btn">Download</button>
+  <button id="clearUserMsgs" class="small-btn">Clear</button>
+  <div id="savedUserMsgs" style="margin-top:10px;"></div>
 </div>
 
-<!-- MAIN APP (hidden until correct password) -->
-<main id="mainApp" role="main">
-  <div class="topbar">
-    <div>
-      <div class="site-title">प्राइवेट साइट — आपका स्वागत है</div>
-      <div class="muted">यहाँ आपकी निजी सामग्री और मैसेजेस मिलेंगे</div>
-    </div>
+<h2>📁 Hidden Photos</h2>
+<div id="photosArea" class="section"></div>
 
-    <div class="menu">
-      <button id="toggleMessagesBtn">Message Box</button>
-      <button id="toggleHiddenBtn">Pages</button>
-      <button id="toggleUserInputBtn">User Input</button>
-      <button id="voiceGuideBtn">Voice Guide</button>
-    </div>
-  </div>
+<h2>🎥 Hidden Videos</h2>
+<div id="videosArea" class="section"></div>
 
-  <!-- Message box -->
-  <section id="messageSection" class="message-box card">
-    <div class="msg-row">
-      <div>
-        <div class="msg-text" id="adminMessage">Loading message...</div>
-        <div class="meta" id="msgTime">—</div>
+<h2>📚 Notes</h2>
+<div id="notesArea" class="section"></div>
+
+</div>
+
+<script>
+/* TTS Function */
+function speak(t){
+  const v = new SpeechSynthesisUtterance(t);
+  v.lang = "hi-IN";
+  speechSynthesis.speak(v);
+}
+
+/* Unlock System */
+function unlockNow(){
+  const p = document.getElementById("password").value.trim();
+  if(p !== "1234"){
+    speak("गलत पासवर्ड है।");
+    alert("Wrong Password!");
+  } else {
+    speak("Access granted.");
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+    loadAdminMessage();
+  }
+}
+
+/* Load Admin Message from messages.json */
+function loadAdminMessage(){
+  fetch("messages.json")
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById("adminMsg").innerHTML =
+      `<div>${d.message}</div>
+       <div class='muted'>${d.timestamp}</div>`;
+  })
+  .catch(()=>{
+    document.getElementById("adminMsg").innerText = "Error loading message.";
+  });
+}
+
+/* Hidden Section Default Content */
+document.getElementById("photosArea").innerHTML =
+  "<div class='muted'>No photos uploaded.</div>";
+document.getElementById("videosArea").innerHTML =
+  "<div class='muted'>No videos uploaded.</div>";
+document.getElementById("notesArea").innerHTML =
+  "<div class='muted'>No notes available.</div>";
+
+/* User Message System */
+function getUserMsgs(){
+  return JSON.parse(localStorage.getItem("userMsgs") || "[]");
+}
+function renderUserMsgs(){
+  let arr = getUserMsgs();
+  const box = document.getElementById("savedUserMsgs");
+  if(arr.length === 0){
+    box.innerHTML = "<div class='muted'>No saved messages.</div>";
+  } else {
+    box.innerHTML = arr.map(m => `
+      <div style='padding:8px;border-radius:8px;background:rgba(255,255,255,0.05);margin-bottom:8px;'>
+        ${m.text}
+        <div class='muted'>${m.time}</div>
       </div>
-      <div class="controls">
-        <button class="small-btn" id="readBtn">👉 पढ़कर सुनाओ</button>
-        <button class="small-btn" id="editLocalBtn" title="Download messages as JSON">🔽 Download</button>
-        <button class="small-btn" id="hideMsgBtn">Hide</button>
-      </div>
-    </div>
-  </section>
+    `).join("");
+  }
+}
+renderUserMsgs();
+
+document.getElementById("sendUserMsg").onclick = ()=>{
+  const txt = document.getElementById("userMsg").value.trim();
+  if(!txt){ speak("कृपया संदेश लिखें।"); return; }
+  let arr = getUserMsgs();
+  arr.push({text:txt, time:new Date().toLocaleString()});
+  localStorage.setItem("userMsgs", JSON.stringify(arr));
+  document.getElementById("userMsg").value = "";
+  renderUserMsgs();
+  speak("संदेश सुरक्षित कर दिया गया।");
+};
+
+document.getElementById("downloadUserMsgs").onclick = ()=>{
+  const data = JSON.stringify(getUserMsgs(), null, 2);
+  const blob = new Blob([data], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="user-messages.json";
+  a.click(); URL.revokeObjectURL(url);
+  speak("डाउनलोड किया जा रहा है।");
+};
+
+document.getElementById("clearUserMsgs").onclick = ()=>{
+  localStorage.removeItem("userMsgs");
+  renderUserMsgs();
+  speak("सभी संदेश हटाए गये।");
+};
+</script>
+
+</body>
+</html>
